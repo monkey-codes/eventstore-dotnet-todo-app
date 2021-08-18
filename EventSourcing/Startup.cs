@@ -1,19 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Autofac;
+using EventSourcing.Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace EventSourcing
 {
@@ -53,6 +49,33 @@ namespace EventSourcing
             {
                 endpoints.MapControllers();
             });
+        }
+        
+        /// <summary>
+        /// Configure Container using Autofac: Register DI.
+        /// This is called AFTER ConfigureServices.
+        /// So things you register here OVERRIDE things registered in ConfigureServices.
+        /// You must have the call to `UseServiceProviderFactory(new AutofacServiceProviderFactory())` in Program.cs
+        /// When building the host or this won't be called.
+        /// </summary>
+        /// <param name="builder"></param>
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            #region WAY-1 (Autofac Module)
+
+            // Add modules registrations.
+
+            builder.RegisterModule(new MediatorAutofacModule());
+
+            #endregion
+
+            #region WAY-2 (Direct Registration)
+
+            // Add services registrations.
+
+            // builder.RegisterType<MyService>().As<IService>();
+
+            #endregion
         }
         
         private async Task JsonResponseWriter(HttpContext context, HealthReport report)

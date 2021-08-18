@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EventSourcing.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -17,15 +18,19 @@ namespace EventSourcing.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IHello _hello;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IHello hello)
         {
             _logger = logger;
+            _hello = hello;
         }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            
+            _logger.LogWarning(_hello.SayHello("bob"));
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
