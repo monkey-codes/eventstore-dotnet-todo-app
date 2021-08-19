@@ -37,6 +37,11 @@ namespace EventSourcing.EventSourcing
             Apply(evt);
             Changes.Add(evt);
         }
+
+        public void Handle(object command)
+        {
+            Invoke(command, "Handle");
+        }
         
         private void Apply(Event evt)
         {

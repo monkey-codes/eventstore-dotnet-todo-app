@@ -35,7 +35,7 @@ namespace EventSourcing.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<CreatedDto> AddItemToList(Guid todoListId, [FromBody] AddTodoItemCommand command, CancellationToken cancellationToken)
         {
-            command.TodoListId = todoListId;
+            command.Id = todoListId;
             var revision = await _mediator.Handle(command, cancellationToken);
             return new CreatedDto(todoListId, revision);
         }

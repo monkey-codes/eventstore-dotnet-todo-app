@@ -6,41 +6,44 @@ using EventSourcing.Mediator;
 
 namespace EventSourcing.Domain
 {
-    public class CreateTodoListCommandHandler : ICommandHandler<CreateTodoListCommand, long>
+    public class AddTodoItemCommandHandler : GenericCommandHandler<AddTodoItemCommand, TodoList>
     {
-        private readonly IEventStoreRepository<TodoList> _repository;
-
-        public CreateTodoListCommandHandler(IEventStoreRepository<TodoList> repository)
+        public AddTodoItemCommandHandler(IEventStoreRepository<TodoList> repository) : base(repository)
         {
-            _repository = repository;
         }
-
-        public async Task<long> Handle(CreateTodoListCommand command, CancellationToken cancellationToken)
+    }
+    
+    public class CreateTodoListCommandHandler: GenericCommandHandler<CreateTodoListCommand, TodoList>
+    {
+        public CreateTodoListCommandHandler(IEventStoreRepository<TodoList> repository) : base(repository)
         {
-            var todoList = await _repository.Load(command.Id);
-            if (todoList == null)
-            {
-                todoList = new TodoList(command);
-            }
-            // var todoList = new TodoList(command);
-            var revision = await _repository.Save(todoList, command.ExpectedRevision, cancellationToken);
-            return revision;
         }
     }
 
-    public class AddTodoItemCommandHandler : ICommandHandler<AddTodoItemCommand, long>
+    public abstract class GenericCommandHandler<TCommand, TAggregateType> : ICommandHandler<TCommand, long>
+        where TCommand : ICommand<TCommand, long>
+        where TAggregateType : Aggregate
     {
-        private readonly IEventStoreRepository<TodoList> _repository;
+        private readonly IEventStoreRepository<TAggregateType> _repository;
 
-        public AddTodoItemCommandHandler(IEventStoreRepository<TodoList> repository)
+        public GenericCommandHandler(IEventStoreRepository<TAggregateType> repository)
         {
             _repository = repository;
         }
-        public async Task<long> Handle(AddTodoItemCommand command, CancellationToken cancellationToken)
+        public async Task<long> Handle(TCommand command, CancellationToken cancellationToken)
         {
-            var todoList = await _repository.Load(command.TodoListId);
-            todoList.Handle(command);
-            var revision = await _repository.Save(todoList, command.ExpectedRevision, cancellationToken);
+            var aggregate = await _repository.Load(command.Id);
+            if (aggregate == null)
+            {
+                var type = typeof(TAggregateType);
+                aggregate = (TAggregateType) Activator.CreateInstance(type, command);
+            }
+            else
+            {
+                aggregate.Handle(command);
+            }
+ 
+            var revision = await _repository.Save(aggregate, command.ExpectedRevision, cancellationToken);
             return revision;
         }
     }

@@ -1,4 +1,6 @@
 using Autofac;
+using EventSourcing.Domain;
+using EventSourcing.EventSourcing;
 
 namespace EventSourcing.Mediator
 {
@@ -20,6 +22,10 @@ namespace EventSourcing.Mediator
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
+            // builder.RegisterGeneric(typeof(GenericCommandHandler<,>))
+            //     // .As(typeof(ICommandHandler<,>))
+            //     .InstancePerLifetimeScope();
+            
             builder.RegisterType<Hello>().As<IHello>()
                 .InstancePerLifetimeScope();
         }

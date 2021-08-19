@@ -24,7 +24,7 @@ namespace EventSourcing.Domain
             ApplyChange(
                 new TodoItemAddedEvent
                 {
-                    AggregateId = command.TodoListId,
+                    AggregateId = command.Id,
                     ItemId = command.ItemId,
                     Description = command.Description
                 }
