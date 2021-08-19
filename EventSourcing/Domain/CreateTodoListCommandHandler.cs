@@ -6,7 +6,7 @@ using EventSourcing.Mediator;
 
 namespace EventSourcing.Domain
 {
-    public class CreateTodoListCommandHandler : ICommandHandler<CreateTodoListCommand, Guid>
+    public class CreateTodoListCommandHandler : ICommandHandler<CreateTodoListCommand, long>
     {
         private readonly IEventStoreRepository<TodoList> _repository;
 
@@ -15,15 +15,20 @@ namespace EventSourcing.Domain
             _repository = repository;
         }
 
-        public async Task<Guid> Handle(CreateTodoListCommand command, CancellationToken cancellationToken)
+        public async Task<long> Handle(CreateTodoListCommand command, CancellationToken cancellationToken)
         {
-            var todoList = new TodoList(command);
-            await _repository.Save(todoList, cancellationToken);
-            return command.Id;
+            var todoList = await _repository.Load(command.Id);
+            if (todoList == null)
+            {
+                todoList = new TodoList(command);
+            }
+            // var todoList = new TodoList(command);
+            var revision = await _repository.Save(todoList, command.ExpectedRevision, cancellationToken);
+            return revision;
         }
     }
 
-    public class AddTodoItemCommandHandler : ICommandHandler<AddTodoItemCommand, Guid>
+    public class AddTodoItemCommandHandler : ICommandHandler<AddTodoItemCommand, long>
     {
         private readonly IEventStoreRepository<TodoList> _repository;
 
@@ -31,12 +36,12 @@ namespace EventSourcing.Domain
         {
             _repository = repository;
         }
-        public async Task<Guid> Handle(AddTodoItemCommand command, CancellationToken cancellationToken)
+        public async Task<long> Handle(AddTodoItemCommand command, CancellationToken cancellationToken)
         {
             var todoList = await _repository.Load(command.TodoListId);
             todoList.Handle(command);
-            await _repository.Save(todoList, cancellationToken);
-            return todoList.AggregateId;
+            var revision = await _repository.Save(todoList, command.ExpectedRevision, cancellationToken);
+            return revision;
         }
     }
 }

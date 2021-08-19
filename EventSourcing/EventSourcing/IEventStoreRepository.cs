@@ -11,7 +11,7 @@ namespace EventSourcing.EventSourcing
     public interface IEventStoreRepository<T>
     where T : Aggregate
     {
-        Task Save(T todoList, CancellationToken cancellationToken);
+        Task<long> Save(T todoList, long expectedRevision, CancellationToken cancellationToken);
         Task<T> Load(Guid aggregateId);
     }
 
@@ -24,31 +24,39 @@ namespace EventSourcing.EventSourcing
         {
             _client = client;
         }
-        public async Task Save(T t, CancellationToken cancellationToken)
+        public async Task<long> Save(T t, long expectedRevision, CancellationToken cancellationToken)
         {
             var eventDatas = t.Changes.Select(evt => new EventData(
                 Uuid.NewUuid(),
                 evt.EventType,
                 JsonSerializer.SerializeToUtf8Bytes(evt,evt.GetType())
             ));
+            
             var streamName = StreamName(t.GetType(), t.AggregateId);
-            await _client.AppendToStreamAsync(
+            var revision =
+                expectedRevision == -1 ? StreamRevision.None : StreamRevision.FromInt64(expectedRevision);
+            return (await _client.AppendToStreamAsync(
                 streamName,
-                StreamState.Any,
+                revision,
                 eventDatas,
                 cancellationToken: cancellationToken
-            );
+            )).NextExpectedStreamRevision.ToInt64();
         }
 
         public async Task<T> Load(Guid aggregateId)
         {
             var type = typeof(T);
             var streamName = StreamName(type, aggregateId);
-            var events = await _client.ReadStreamAsync(
+            var readStreamResult = _client.ReadStreamAsync(
                 Direction.Forwards,
                 streamName,
                 StreamPosition.Start
-            ).Select(evt => ToEvent(evt))
+            );
+            if (await readStreamResult.ReadState == ReadState.StreamNotFound)
+            {
+                return null;
+            }
+            var events = await readStreamResult.Select(evt => ToEvent(evt))
                 .ToListAsync();
             var instance = (T) Activator.CreateInstance(type, new [] {events});
             return instance;

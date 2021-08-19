@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventSourcing.Domain;
 using EventSourcing.Mediator;
+using EventStore.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +27,8 @@ namespace EventSourcing.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<CreatedDto> CreateTodoList([FromBody] CreateTodoListCommand command, CancellationToken cancellationToken)
         {
-            return new CreatedDto(await _mediator.Handle(command, cancellationToken));
+            var revision = await _mediator.Handle(command, cancellationToken);
+            return new CreatedDto(command.Id, revision);
         }
         
         [HttpPost, Route("{todoListId}/items")]
@@ -34,7 +36,8 @@ namespace EventSourcing.Controllers
         public async Task<CreatedDto> AddItemToList(Guid todoListId, [FromBody] AddTodoItemCommand command, CancellationToken cancellationToken)
         {
             command.TodoListId = todoListId;
-            return new CreatedDto(await _mediator.Handle(command, cancellationToken));
+            var revision = await _mediator.Handle(command, cancellationToken);
+            return new CreatedDto(todoListId, revision);
         }
 
     }
@@ -42,10 +45,12 @@ namespace EventSourcing.Controllers
     public class CreatedDto
     {
         public Guid Id { get; set; }
+        public long Revision { get; set; }
 
-        public CreatedDto(Guid id)
+        public CreatedDto(Guid id, long revision = -1)
         {
             Id = id;
+            Revision = revision;
         }
     }
 }

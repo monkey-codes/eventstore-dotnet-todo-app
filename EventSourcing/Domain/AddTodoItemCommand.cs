@@ -3,7 +3,7 @@ using EventSourcing.Mediator;
 
 namespace EventSourcing.Domain
 {
-    public class AddTodoItemCommand : ICommand<AddTodoItemCommand, Guid>
+    public class AddTodoItemCommand : CommandBase<AddTodoItemCommand, long>
     {
         public Guid TodoListId { get; set; }
         public Guid ItemId { get; set; }
