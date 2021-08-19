@@ -24,10 +24,28 @@ namespace EventSourcing.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<Guid> CreateSiteVisit([FromBody] CreateTodoListCommand command, CancellationToken cancellationToken)
+        public async Task<CreatedDto> CreateTodoList([FromBody] CreateTodoListCommand command, CancellationToken cancellationToken)
         {
-            return await _mediator.Handle(command, cancellationToken);
+            return new CreatedDto(await _mediator.Handle(command, cancellationToken));
+        }
+        
+        [HttpPost, Route("{todoListId}/items")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<CreatedDto> AddItemToList(Guid todoListId, [FromBody] AddTodoItemCommand command, CancellationToken cancellationToken)
+        {
+            command.TodoListId = todoListId;
+            return new CreatedDto(await _mediator.Handle(command, cancellationToken));
         }
 
+    }
+
+    public class CreatedDto
+    {
+        public Guid Id { get; set; }
+
+        public CreatedDto(Guid id)
+        {
+            Id = id;
+        }
     }
 }

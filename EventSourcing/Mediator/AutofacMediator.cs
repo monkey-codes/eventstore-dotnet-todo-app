@@ -15,16 +15,7 @@ namespace EventSourcing.Mediator
             _scope = scope;
             _logger = logger;
         }
-
-        // public async Task<TResponse> Handle<TCommand, TResponse>(TCommand command, CancellationToken cancellationToken)
-        //     where TCommand : ICommand<TCommand, TResponse>
-        // {
-        //     var handler = _scope.Resolve<ICommandHandler<TCommand, TResponse>>();
-        //     _logger.LogInformation($"{{Handler}} handling {{Command}}",
-        //         handler.GetType().ToString(), command.GetType().ToString());
-        //     return await handler.Handle(command, cancellationToken);
-        // }
-
+        
         public async Task<TResponse> Handle<TCommand, TResponse>(ICommand<TCommand, TResponse> command, CancellationToken cancellationToken) 
             where TCommand : ICommand<TCommand, TResponse>
         {

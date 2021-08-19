@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using Autofac;
+using EventSourcing.EventSourcing;
 using EventSourcing.Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -65,6 +66,7 @@ namespace EventSourcing
 
             // Add modules registrations.
 
+            builder.RegisterModule(new EventSourcingAutofacModule());
             builder.RegisterModule(new MediatorAutofacModule());
 
             #endregion
