@@ -38,9 +38,9 @@ namespace EventSourcing.EventSourcing
             Changes.Add(evt);
         }
 
-        public void Handle(object command)
+        public object Handle(object command)
         {
-            Invoke(command, "Handle");
+            return Invoke(command, "Handle");
         }
         
         private void Apply(Event evt)
@@ -48,9 +48,9 @@ namespace EventSourcing.EventSourcing
             Invoke(evt, "On");
         }
 
-        private void Invoke(object evt, string methodName)
+        private object Invoke(object evt, string methodName)
         {
-            GetType().GetMethod(methodName, new [] {evt.GetType()})?.Invoke(this, new [] {evt});
+            return GetType().GetMethod(methodName, new [] {evt.GetType()})?.Invoke(this, new [] {evt});
         }
     }
 }

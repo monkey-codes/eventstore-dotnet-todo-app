@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventSourcing.Domain;
 using EventSourcing.Mediator;
-using EventStore.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,32 +24,35 @@ namespace EventSourcing.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<CreatedDto> CreateTodoList([FromBody] CreateTodoListCommand command, CancellationToken cancellationToken)
+        public async Task<OkDto> CreateTodoList([FromBody] CreateTodoListCommand command, CancellationToken cancellationToken)
         {
             var revision = await _mediator.Handle(command, cancellationToken);
-            return new CreatedDto(command.Id, revision);
+            return new OkDto(command.Id, revision.Revision, revision.Response);
         }
         
         [HttpPost, Route("{todoListId}/items")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<CreatedDto> AddItemToList(Guid todoListId, [FromBody] AddTodoItemCommand command, CancellationToken cancellationToken)
+        public async Task<OkDto> AddItemToList(Guid todoListId, [FromBody] AddTodoItemCommand command, CancellationToken cancellationToken)
         {
             command.Id = todoListId;
             var revision = await _mediator.Handle(command, cancellationToken);
-            return new CreatedDto(todoListId, revision);
+            return new OkDto(command.Id, revision.Revision, revision.Response);
         }
 
     }
-
-    public class CreatedDto
+    
+    public class OkDto
     {
         public Guid Id { get; set; }
         public long Revision { get; set; }
-
-        public CreatedDto(Guid id, long revision = -1)
+        
+        public object Response { get; set; }
+    
+        public OkDto(Guid id, long revision = -1, object response = null)
         {
             Id = id;
             Revision = revision;
+            Response = response;
         }
     }
 }
