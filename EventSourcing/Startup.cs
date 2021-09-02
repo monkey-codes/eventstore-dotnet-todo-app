@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Autofac;
 using EventSourcing.EventSourcing;
 using EventSourcing.Mediator;
+using EventSourcing.Query;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -68,6 +69,7 @@ namespace EventSourcing
 
             builder.RegisterModule(new EventSourcingAutofacModule());
             builder.RegisterModule(new MediatorAutofacModule());
+            builder.RegisterModule(new QueryAutofacModule());
 
             #endregion
 

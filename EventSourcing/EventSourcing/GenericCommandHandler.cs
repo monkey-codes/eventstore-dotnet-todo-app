@@ -32,6 +32,7 @@ namespace EventSourcing.EventSourcing
             var revision = await _repository.Save(aggregate, command.ExpectedRevision, cancellationToken);
             return new RevisionedResponse<TResponse>
             {
+                Id = command.Id,
                 Revision = revision,
                 Response = response
             };
@@ -39,6 +40,7 @@ namespace EventSourcing.EventSourcing
     }
     public class RevisionedResponse<TResponse>
     {
+        public Guid Id { get; set; }
         public long Revision { get; set; }
         public TResponse Response { get; set; }
     }
