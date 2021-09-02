@@ -1,11 +1,14 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace EventSourcing.EventSourcing
 {
     public class Event
     {
         public Guid AggregateId { get; set; }
-        public long Revision { get; } = -1;
+
+        [JsonIgnore] 
+        public long Revision { get; set; } = -1;
         
         public DateTimeOffset Created { get; } = DateTimeOffset.UtcNow;
 

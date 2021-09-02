@@ -24,5 +24,13 @@ namespace EventSourcing.Mediator
                 handler.GetType().ToString(), command.GetType().ToString());
             return await handler.Handle((TCommand)command, cancellationToken);
         }
+
+        public async Task<TResponse> Query<TQuery, TResponse>(IQuery<TQuery, TResponse> query, CancellationToken cancellationToken) where TQuery : IQuery<TQuery, TResponse>
+        {
+            var handler = _scope.Resolve<IQueryHandler<TQuery, TResponse>>();
+            _logger.LogInformation($"{{Handler}} handling {{Query}}",
+                handler.GetType().ToString(), query.GetType().ToString());
+            return await handler.Query((TQuery)query, cancellationToken);
+        }
     }
 }

@@ -1,6 +1,7 @@
 namespace EventSourcing.Mediator
 {
-    public interface IQuery<TResponse>
+    public interface IQuery<TQuery, TResponse>
+    where TQuery: IQuery<TQuery, TResponse>
     {
         
     }

@@ -8,9 +8,12 @@ namespace EventSourcing.Query
         {
 
             // builder.Regis
-            builder
-                .RegisterType<Subscription>()
-                .As<IStartable>()
+            // builder
+            //     .RegisterType<Subscription>()
+            //     .As<IStartable>()
+            //     .SingleInstance();
+            builder.RegisterType<TodoListsRepository>()
+                .AsImplementedInterfaces()
                 .SingleInstance();
         } 
     }

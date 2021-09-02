@@ -22,6 +22,11 @@ namespace EventSourcing.Mediator
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
+            builder.RegisterAssemblyTypes(ThisAssembly)
+                .AsClosedTypesOf(typeof(IQueryHandler<,>))
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+            
             // builder.RegisterGeneric(typeof(GenericCommandHandler<,>))
             //     // .As(typeof(ICommandHandler<,>))
             //     .InstancePerLifetimeScope();
