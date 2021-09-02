@@ -26,8 +26,6 @@ namespace EventSourcing.Mediator
             //     // .As(typeof(ICommandHandler<,>))
             //     .InstancePerLifetimeScope();
             
-            builder.RegisterType<Hello>().As<IHello>()
-                .InstancePerLifetimeScope();
         }
     }
 }
