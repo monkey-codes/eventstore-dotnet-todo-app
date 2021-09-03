@@ -31,23 +31,32 @@ namespace EventSourcing.Controllers
         {
             return await _mediator.Query(new ListAllTodoListsQuery(), cancellationToken);
         }
-        
+
+        [HttpGet, Route("{Id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<TodoListQueryModel> GetTodoList([FromRoute] GetTodoListQuery query,
+            CancellationToken cancellationToken)
+        {
+            return await _mediator.Query(query, cancellationToken);
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<RevisionedResponse<object>> CreateTodoList([FromBody] CreateTodoListCommand command, CancellationToken cancellationToken)
+        public async Task<RevisionedResponse<object>> CreateTodoList([FromBody] CreateTodoListCommand command,
+            CancellationToken cancellationToken)
         {
             var revision = await _mediator.Handle(command, cancellationToken);
             return revision;
         }
-        
+
         [HttpPost, Route("{todoListId}/items")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<RevisionedResponse<object>> AddItemToList(Guid todoListId, [FromBody] AddTodoItemCommand command, CancellationToken cancellationToken)
+        public async Task<RevisionedResponse<object>> AddItemToList(Guid todoListId,
+            [FromBody] AddTodoItemCommand command, CancellationToken cancellationToken)
         {
             command.Id = todoListId;
             var revision = await _mediator.Handle(command, cancellationToken);
             return revision;
         }
-
     }
 }

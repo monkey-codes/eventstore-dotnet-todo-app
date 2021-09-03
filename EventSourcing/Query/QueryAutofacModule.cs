@@ -6,13 +6,8 @@ namespace EventSourcing.Query
     {
         protected override void Load(ContainerBuilder builder)
         {
-
-            // builder.Regis
-            // builder
-            //     .RegisterType<Subscription>()
-            //     .As<IStartable>()
-            //     .SingleInstance();
-            builder.RegisterType<TodoListsRepository>()
+            builder.RegisterAssemblyTypes(ThisAssembly)
+                .AsClosedTypesOf(typeof(MemoryRepository<,>))
                 .AsImplementedInterfaces()
                 .SingleInstance();
         } 
