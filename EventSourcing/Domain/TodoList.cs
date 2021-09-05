@@ -51,14 +51,4 @@ namespace EventSourcing.Domain
         public Guid Id { get; set; }
         public string Description { get; set; }
     }
-
-    public class TodoItemAddedEvent : Event
-    {
-        public Guid ItemId { get; set; }
-        public string Description { get; set; }
-    }
-
-    public class TodoListCreatedEvent : Event
-    {
-    }
 }
