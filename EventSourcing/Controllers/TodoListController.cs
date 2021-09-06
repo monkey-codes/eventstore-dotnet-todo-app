@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using EventSourcing.Domain;
 using EventSourcing.EventSourcing;
 using EventSourcing.Mediator;
 using EventSourcing.Query;
+using EventSourcing.Query.Projection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,8 +27,12 @@ namespace EventSourcing.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IEnumerable<TodoListIndexItem>> ListAllTodoLists(CancellationToken cancellationToken)
+        public async Task<object> ListAllTodoLists([FromQuery(Name = "using")] string strategy, CancellationToken cancellationToken)
         {
+            if (strategy == "projection")
+            {
+                return  (await _mediator.Query(new ListAllTodoListsQueryUsingProjection(), cancellationToken));
+            }
             return await _mediator.Query(new ListAllTodoListsQuery(), cancellationToken);
         }
 
