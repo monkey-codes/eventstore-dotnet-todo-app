@@ -31,16 +31,24 @@ namespace EventSourcing.Controllers
         {
             if (strategy == "projection")
             {
-                return  (await _mediator.Query(new ListAllTodoListsQueryUsingProjection(), cancellationToken));
+                return  (await _mediator.Query(new ListAllTodoListsUsingProjectionQuery(), cancellationToken));
             }
             return await _mediator.Query(new ListAllTodoListsQuery(), cancellationToken);
         }
 
         [HttpGet, Route("{Id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<TodoListQueryModel> GetTodoList([FromRoute] GetTodoListQuery query,
+        public async Task<object> GetTodoList([FromRoute] GetTodoListQuery query,
+            [FromQuery(Name = "using")] string strategy,
             CancellationToken cancellationToken)
         {
+            if (strategy == "projection")
+            {
+                return  (await _mediator.Query(new GetTodoListUsingProjectionQuery
+                {
+                    Id = query.Id
+                }, cancellationToken));
+            }
             return await _mediator.Query(query, cancellationToken);
         }
 

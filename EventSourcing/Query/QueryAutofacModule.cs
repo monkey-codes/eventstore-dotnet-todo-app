@@ -1,3 +1,4 @@
+using System.Linq;
 using Autofac;
 using EventSourcing.Query.Projection;
 
@@ -15,7 +16,11 @@ namespace EventSourcing.Query
                 .AsImplementedInterfaces()
                 .SingleInstance();
 
-            builder.RegisterType<ProjectionManager>()
+
+            builder.RegisterTypes(ThisAssembly.GetTypes()
+                    .Where(type => type.BaseType == typeof(AbstractProjectionManager))
+                    .ToArray()
+                )
                 .As<IStartable>()
                 .SingleInstance();
         } 
