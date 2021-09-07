@@ -1,9 +1,10 @@
 using System;
+using System.Threading;
 using Autofac;
 using EventStore.Client;
 using Microsoft.Extensions.Logging;
 
-namespace EventSourcing.Query.Projection
+namespace EventSourcing.Query.UsingProjection
 {
     public abstract class AbstractProjectionManager : IStartable
     {
@@ -23,8 +24,12 @@ namespace EventSourcing.Query.Projection
 
         public async void Start()
         {
+            
             try
             {
+                //Hack to get around the race condition of CreateContinuousAsync simultaneously from 2 separate threads
+                //TODO One solution may be to just have global ProjectionManager that sequentially registers all the projections.
+                Thread.Sleep(new Random().Next(100, 2000));
                 await _client.CreateContinuousAsync(_name, _js);
             }
             catch (InvalidOperationException e) when (e.Message.Contains("Conflict"))
@@ -33,6 +38,10 @@ namespace EventSourcing.Query.Projection
                 _logger.LogInformation(format);
                 await _client.UpdateAsync(_name, _js);
                 await _client.ResetAsync(_name);
+            }
+            catch (InvalidOperationException e)
+            {
+                _logger.LogError(e, "Could not create {name} projection: {message}", _name, e.Message);
             }
         }
     }

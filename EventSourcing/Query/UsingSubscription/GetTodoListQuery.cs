@@ -7,9 +7,9 @@ using EventSourcing.EventSourcing;
 using EventSourcing.Mediator;
 using Microsoft.Extensions.Logging;
 
-namespace EventSourcing.Query
+namespace EventSourcing.Query.UsingSubscription
 {
-    public class GetTodoListQuery : IQuery<GetTodoListQuery, TodoListQueryModel>
+    public class GetTodoListUsingSubscriptionQuery : IQuery<GetTodoListUsingSubscriptionQuery, TodoListQueryModel>
     {
         public Guid Id { get; set; }
     }
@@ -21,16 +21,16 @@ namespace EventSourcing.Query
         }
     }
         
-    public class GetTodoListQueryHandler : IQueryHandler<GetTodoListQuery, TodoListQueryModel>
+    public class GetTodoListUsingSubscriptionQueryHandler : IQueryHandler<GetTodoListUsingSubscriptionQuery, TodoListQueryModel>
     {
         private readonly IRepository<TodoListQueryModel> _repository;
 
-        public GetTodoListQueryHandler(IRepository<TodoListQueryModel> repository)
+        public GetTodoListUsingSubscriptionQueryHandler(IRepository<TodoListQueryModel> repository)
         {
             _repository = repository;
         }
 
-        public async Task<TodoListQueryModel> Query(GetTodoListQuery query,
+        public async Task<TodoListQueryModel> Query(GetTodoListUsingSubscriptionQuery query,
             CancellationToken cancellationToken)
         {
             return await _repository.Load(query.Id);

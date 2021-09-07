@@ -1,6 +1,7 @@
 using System.Linq;
 using Autofac;
-using EventSourcing.Query.Projection;
+using EventSourcing.Query.UsingProjection;
+using EventSourcing.Query.UsingSubscription;
 
 namespace EventSourcing.Query
 {

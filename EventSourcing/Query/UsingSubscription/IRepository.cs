@@ -7,7 +7,7 @@ using Autofac;
 using EventSourcing.EventSourcing;
 using Microsoft.Extensions.Logging;
 
-namespace EventSourcing.Query
+namespace EventSourcing.Query.UsingSubscription
 {
     
     public interface IRepository<TQueryModel>

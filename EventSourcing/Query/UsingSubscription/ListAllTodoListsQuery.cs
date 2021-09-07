@@ -7,9 +7,9 @@ using EventSourcing.EventSourcing;
 using EventSourcing.Mediator;
 using Microsoft.Extensions.Logging;
 
-namespace EventSourcing.Query
+namespace EventSourcing.Query.UsingSubscription
 {
-    public class ListAllTodoListsQuery : IQuery<ListAllTodoListsQuery, IEnumerable<TodoListIndexItem>>
+    public class ListAllTodoListsUsingSubscriptionQuery : IQuery<ListAllTodoListsUsingSubscriptionQuery, IEnumerable<TodoListIndexItem>>
     {
     }
 
@@ -21,16 +21,16 @@ namespace EventSourcing.Query
         }
     }
 
-    public class ListAllTodoListsQueryHandler : IQueryHandler<ListAllTodoListsQuery, IEnumerable<TodoListIndexItem>>
+    public class ListAllTodoListsUsingSubscriptionQueryHandler : IQueryHandler<ListAllTodoListsUsingSubscriptionQuery, IEnumerable<TodoListIndexItem>>
     {
         private readonly IRepository<TodoListIndexItem> _repository;
 
-        public ListAllTodoListsQueryHandler(IRepository<TodoListIndexItem> repository)
+        public ListAllTodoListsUsingSubscriptionQueryHandler(IRepository<TodoListIndexItem> repository)
         {
             _repository = repository;
         }
 
-        public async Task<IEnumerable<TodoListIndexItem>> Query(ListAllTodoListsQuery query,
+        public async Task<IEnumerable<TodoListIndexItem>> Query(ListAllTodoListsUsingSubscriptionQuery query,
             CancellationToken cancellationToken)
         {
             return await _repository.All();

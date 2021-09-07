@@ -6,7 +6,7 @@ using EventSourcing.Mediator;
 using EventStore.Client;
 using Microsoft.Extensions.Logging;
 
-namespace EventSourcing.Query.Projection
+namespace EventSourcing.Query.UsingProjection
 {
     public class GetTodoListProjectionManager : AbstractProjectionManager
     {

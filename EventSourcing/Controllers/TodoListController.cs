@@ -6,7 +6,8 @@ using EventSourcing.Domain;
 using EventSourcing.EventSourcing;
 using EventSourcing.Mediator;
 using EventSourcing.Query;
-using EventSourcing.Query.Projection;
+using EventSourcing.Query.UsingProjection;
+using EventSourcing.Query.UsingSubscription;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,12 +34,12 @@ namespace EventSourcing.Controllers
             {
                 return  (await _mediator.Query(new ListAllTodoListsUsingProjectionQuery(), cancellationToken));
             }
-            return await _mediator.Query(new ListAllTodoListsQuery(), cancellationToken);
+            return await _mediator.Query(new ListAllTodoListsUsingSubscriptionQuery(), cancellationToken);
         }
 
         [HttpGet, Route("{Id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<object> GetTodoList([FromRoute] GetTodoListQuery query,
+        public async Task<object> GetTodoList([FromRoute] GetTodoListUsingSubscriptionQuery query,
             [FromQuery(Name = "using")] string strategy,
             CancellationToken cancellationToken)
         {

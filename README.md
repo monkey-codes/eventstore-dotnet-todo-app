@@ -1,9 +1,3 @@
-## Hotswap code changes
-```
-$ cd EventSourcing
-$ dotnet watch run
-```
-
 ## EventStoreDB
 
 Run the db
@@ -13,10 +7,17 @@ $ docker-compose up
 
 [Admin UI](http://localhost:2113/web/index.html#/dashboard)
 
+## Hotswap code changes
+```
+$ cd EventSourcing
+$ dotnet watch run
+```
 
 ## API
 
-Create a new todo list
+### Commands
+
+#### Create a new todo list
 
 ```
 $ curl --request POST \
@@ -34,6 +35,7 @@ $ curl --request POST \
 }
 ```
 
+#### Add Item to TodoList
 To add items to the list the most recent revision number needs to be included in the 
 command, this ensures that the list has not been
 modified since the last read by this client. (Almost like optimistic locking)
@@ -57,8 +59,17 @@ $ curl --request POST \
 }
 
 ```
+### Queries
 
-List all todo lists
+Query models are built using 2 different mechanisms, *subscriptions* and *projections*. With
+subscriptions the application listens to events and the creates/updates the query model and stores 
+it outside of eventStoreDb (e.g Relational DB or memory). Projections on the other hand are
+registered inside of eventStoreDb. The projections typically run continuously and are updated as
+new events are appended to target streams. The results of projections are stored in a stream on
+eventStoreDb. Projections execute on the eventStoreDb, not on the client.
+
+
+List all todo lists (Using subscription query model)
 
 ```
 $ curl --request GET \
@@ -87,7 +98,14 @@ $ curl --request GET \
 
 ```
 
-Get a specific TodoList
+List all todo lists (Using projection query model)
+```
+$ curl --request GET \
+  --url 'https://localhost:5001/api/todolist?using=projection' \
+  --header 'Content-Type: application/json'
+```
+
+Get a specific TodoList (Using subscription query model)
 
 ```
 $ curl --request GET \
@@ -116,5 +134,12 @@ $ curl --request GET \
 }
 
 ```
+Get a specific TodoList  (Using projection query model)
+```
+$ curl --request GET \
+  --url 'https://localhost:5001/api/todolist/ee5fbd4e-e79a-42cb-a07a-12177da7d23a?using=projection' \
+  --header 'Content-Type: application/json'
+```
+
 ## References
 * https://github.com/evgeniy-khist/eventstoredb-event-sourcing
